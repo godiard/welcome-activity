@@ -1,0 +1,31 @@
+<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd' [
+	<!ENTITY stroke_color "#010101">
+	<!ENTITY fill_color "#FFFFFF">
+]>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.0"
+   width="55"
+   height="55"
+   id="svg2173">
+  <defs
+     id="defs3047" />
+  <path
+     d="M 27.538898,41.586986 C 12.116478,44.371168 -1.6872725,31.346126 9.5065333,15.415658 31.450797,-9.7623568 71.928846,21.429706 35.517841,38.172308 36.13187,41.629459 35.382976,39.653597 40.550888,48.676127 31.143132,46.354402 30.14151,45.351303 27.538898,41.586986 z"
+     id="path3829"
+     style="fill:&stroke_color;;stroke:&stroke_color;stroke-width:4.25035143;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+  <text
+     x="10.535607"
+     y="32.979588"
+     transform="scale(1.1223822,0.89096209)"
+     id="text3057"
+     xml:space="preserve"
+     style="font-size:18.1829319px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:&fill_color;;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"><tspan
+       x="10.535607"
+       y="32.979588"
+       id="tspan3059">Hi!</tspan></text>
+</svg>

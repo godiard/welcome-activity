@@ -1,0 +1,7 @@
+[Activity]
+name = Welcome
+activity_version = 1
+bundle_id = org.laptop.WelcomeActivity
+exec = sugar-activity activity.WelcomeActivity
+icon = welcome-activity
+license = GPLv2+

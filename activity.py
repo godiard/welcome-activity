@@ -134,9 +134,8 @@ class ImageCollectionViewer(gtk.VBox):
             next_bt.connect('clicked', self.next_image_clicked_cb)
 
             _next_button = gtk.Button()
-            image = Icon(icon_name='go-right')
-            _next_button.set_image(image)
-            _next_button.set_label(_('Next'))
+            _next_button.set_label(gtk.STOCK_GO_FORWARD)
+            _next_button.set_use_stock(True)
             _next_button.connect('clicked', self.__next_clicked_cb)
             right_box.pack_end(_next_button, False, False,
                     padding=style.zoom(30))

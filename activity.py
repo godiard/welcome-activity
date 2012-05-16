@@ -19,6 +19,7 @@ import logging
 from gettext import gettext as _
 
 import gtk
+import gobject
 
 from sugar.activity import activity
 from sugar.graphics.toolbarbox import ToolbarBox
@@ -27,6 +28,8 @@ from sugar.activity.widgets import StopButton
 from sugar.graphics import style
 from sugar.graphics.toolbutton import ToolButton
 from sugar.graphics.icon import Icon
+
+DEFAULT_CHANGE_IMAGE_TIME = 10
 
 
 class WelcomeActivity(activity.Activity):
@@ -145,6 +148,9 @@ class ImageCollectionViewer(gtk.VBox):
 
         self.show_all()
 
+        self.timer_id = gobject.timeout_add_seconds(DEFAULT_CHANGE_IMAGE_TIME,
+                self.auto_change_image)
+
         # calculate space available for images
         #   (only to tell to the designers)
         height_av = gtk.gdk.screen_height() - style.GRID_CELL_SIZE * 2
@@ -154,7 +160,14 @@ class ImageCollectionViewer(gtk.VBox):
     def __next_clicked_cb(self, button):
         gtk.main_quit()
 
+    def auto_change_image(self):
+        self.next_image_clicked_cb(None)
+        return True
+
     def next_image_clicked_cb(self, button):
+        gobject.source_remove(self.timer_id)
+        self.timer_id = gobject.timeout_add_seconds(DEFAULT_CHANGE_IMAGE_TIME,
+                self.auto_change_image)
         self.image_order += 1
         if self.image_order == len(self.image_files_list):
             self.image_order = 0

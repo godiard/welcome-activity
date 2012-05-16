@@ -75,7 +75,8 @@ class CustomButton(gtk.Button):
 
     def __init__(self, icon):
         super(gtk.Button, self).__init__()
-        icon = Icon(file='./icons/%s.svg' % icon)
+        path = os.path.expanduser('~/Activities/Welcome.activity/icons/')
+        icon = Icon(file='%s/%s.svg' % (path, icon))
         self.set_image(icon)
         self.modify_bg(gtk.STATE_NORMAL, style.COLOR_WHITE.get_gdk_color())
         self.modify_bg(gtk.STATE_PRELIGHT, style.COLOR_WHITE.get_gdk_color())

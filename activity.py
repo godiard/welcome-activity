@@ -109,7 +109,7 @@ class ImageCollectionViewer(gtk.VBox):
             # Create bottom controls
 
             bottom_toolbar = gtk.HBox()
-            self.pack_start(bottom_toolbar, False, padding=5)
+            self.pack_start(bottom_toolbar, False, padding=style.zoom(30))
 
             left_box = gtk.HBox()
             bottom_toolbar.pack_start(left_box, False, padding=0)
@@ -135,7 +135,8 @@ class ImageCollectionViewer(gtk.VBox):
             _next_button.set_image(image)
             _next_button.set_label(_('Next'))
             _next_button.connect('clicked', self.__next_clicked_cb)
-            right_box.pack_end(_next_button, False, False, padding=5)
+            right_box.pack_end(_next_button, False, False,
+                    padding=style.zoom(30))
 
             # do the right_box and left_box have the same size
             width = int(gtk.gdk.screen_width() / 4)

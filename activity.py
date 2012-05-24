@@ -75,15 +75,17 @@ class WelcomeActivity(activity.Activity):
         self.set_canvas(self.image_viewer)
 
 
-class CustomButton(gtk.Button):
+class CustomButton(gtk.EventBox):
 
-    def __init__(self, icon):
-        super(gtk.Button, self).__init__()
+    def __init__(self, icon, size):
+        super(gtk.EventBox, self).__init__()
+        image = gtk.Image()
         path = os.path.expanduser('~/Activities/Welcome.activity/icons/')
-        icon = Icon(file='%s/%s.svg' % (path, icon))
-        self.set_image(icon)
+        pxb = gtk.gdk.pixbuf_new_from_file_at_size('%s/%s.svg' % (path, icon),
+                size, size)
+        image.set_from_pixbuf(pxb)
+        self.add(image)
         self.modify_bg(gtk.STATE_NORMAL, style.COLOR_WHITE.get_gdk_color())
-        self.modify_bg(gtk.STATE_PRELIGHT, style.COLOR_WHITE.get_gdk_color())
 
 
 class ImageCollectionViewer(gtk.VBox):
@@ -126,20 +128,21 @@ class ImageCollectionViewer(gtk.VBox):
             right_box = gtk.HBox()
             bottom_toolbar.pack_start(right_box, False, padding=0)
 
-            prev_bt = CustomButton('go-previous-paired-grey')
-            center_box.pack_start(prev_bt, False, False)
-            prev_bt.connect('clicked', self.prev_image_clicked_cb)
-
-            next_bt = CustomButton('go-next-paired-grey')
-            center_box.pack_start(next_bt, False, False)
-            next_bt.connect('clicked', self.next_image_clicked_cb)
-
             _next_button = gtk.Button()
             _next_button.set_label(gtk.STOCK_GO_FORWARD)
             _next_button.set_use_stock(True)
             _next_button.connect('clicked', self.__next_clicked_cb)
             right_box.pack_end(_next_button, False, False,
                     padding=style.zoom(30))
+            bt_width, bt_height = _next_button.size_request()
+
+            prev_bt = CustomButton('go-previous-paired-grey', bt_height)
+            center_box.pack_start(prev_bt, False, False, 5)
+            prev_bt.connect('button-press-event', self.prev_image_clicked_cb)
+
+            next_bt = CustomButton('go-next-paired-grey', bt_height)
+            center_box.pack_start(next_bt, False, False, 5)
+            next_bt.connect('button-press-event', self.next_image_clicked_cb)
 
             # do the right_box and left_box have the same size
             width = int(gtk.gdk.screen_width() / 4)
@@ -164,7 +167,7 @@ class ImageCollectionViewer(gtk.VBox):
         self.next_image_clicked_cb(None)
         return True
 
-    def next_image_clicked_cb(self, button):
+    def next_image_clicked_cb(self, button, event):
         gobject.source_remove(self.timer_id)
         self.timer_id = gobject.timeout_add_seconds(DEFAULT_CHANGE_IMAGE_TIME,
                 self.auto_change_image)
@@ -173,7 +176,7 @@ class ImageCollectionViewer(gtk.VBox):
             self.image_order = 0
         self.image.set_from_file(self.image_files_list[self.image_order])
 
-    def prev_image_clicked_cb(self, button):
+    def prev_image_clicked_cb(self, button, event):
         self.image_order -= 1
         if self.image_order < 0:
             self.image_order = len(self.image_files_list) - 1

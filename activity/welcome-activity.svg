@@ -17,14 +17,14 @@
   <path
      d="M 27.538898,41.586986 C 12.116478,44.371168 -1.6872725,31.346126 9.5065333,15.415658 31.450797,-9.7623568 71.928846,21.429706 35.517841,38.172308 36.13187,41.629459 35.382976,39.653597 40.550888,48.676127 31.143132,46.354402 30.14151,45.351303 27.538898,41.586986 z"
      id="path3829"
-     style="fill:&stroke_color;;stroke:&stroke_color;stroke-width:4.25035143;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+     fill="&fill_color;" stroke="&stroke_color;" stroke-width="3.5"/>
   <text
      x="10.535607"
      y="32.979588"
      transform="scale(1.1223822,0.89096209)"
      id="text3057"
      xml:space="preserve"
-     style="font-size:18.1829319px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:&fill_color;;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"><tspan
+     style="font-size:18.1829319px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:&stroke_color;;fill-opacity:1;stroke:&stroke_color;;font-family:Sans;-inkscape-font-specification:Sans Bold"><tspan
        x="10.535607"
        y="32.979588"
        id="tspan3059">Hi!</tspan></text>

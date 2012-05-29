@@ -16,7 +16,8 @@
 
 import os
 import logging
-from gettext import gettext as _
+#from gettext import gettext as _
+import gettext
 
 import gtk
 import gobject
@@ -128,9 +129,17 @@ class ImageCollectionViewer(gtk.VBox):
             right_box = gtk.HBox()
             bottom_toolbar.pack_start(right_box, False, padding=0)
 
+            # init gettext
+            locale_path = \
+                    os.path.expanduser('~/Activities/Welcome.activity/locale/')
+            gettext.bindtextdomain('org.laptop.WelcomeActivity', locale_path)
+            gettext.textdomain('org.laptop.WelcomeActivity')
+            _ = gettext.gettext
+
             _next_button = gtk.Button()
-            _next_button.set_label(gtk.STOCK_GO_FORWARD)
-            _next_button.set_use_stock(True)
+            _next_button.set_label(_('Next'))
+            next_image = Icon(icon_name='go-right')
+            _next_button.set_image(next_image)
             _next_button.connect('clicked', self.__next_clicked_cb)
             right_box.pack_end(_next_button, False, False,
                     padding=style.zoom(30))

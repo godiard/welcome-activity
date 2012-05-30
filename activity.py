@@ -55,11 +55,13 @@ class WelcomeActivity(activity.Activity):
         self.image_viewer = ImageCollectionViewer(False)
 
         prev_bt = ToolButton("go-previous-paired")
-        prev_bt.connect("clicked", self.image_viewer.prev_image_clicked_cb)
+        prev_bt.connect("clicked", self.image_viewer.prev_image_clicked_cb,
+                None)
         toolbar_box.toolbar.insert(prev_bt, -1)
 
         next_bt = ToolButton("go-next-paired")
-        next_bt.connect("clicked", self.image_viewer.next_image_clicked_cb)
+        next_bt.connect("clicked", self.image_viewer.next_image_clicked_cb,
+                None)
         toolbar_box.toolbar.insert(next_bt, -1)
 
         separator = gtk.SeparatorToolItem()

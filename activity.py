@@ -31,6 +31,7 @@ from sugar.graphics.toolbutton import ToolButton
 from sugar.graphics.icon import Icon
 
 DEFAULT_CHANGE_IMAGE_TIME = 10
+POWERD_INHIBIT_DIR = '/var/run/powerd-inhibit-suspend'
 
 
 class WelcomeActivity(activity.Activity):
@@ -75,6 +76,10 @@ class WelcomeActivity(activity.Activity):
         self.modify_bg(gtk.STATE_NORMAL, style.COLOR_WHITE.get_gdk_color())
         self.set_canvas(self.image_viewer)
 
+    def can_close(self):
+        self.image_viewer.finish()
+        return True
+
 
 class CustomButton(gtk.EventBox):
 
@@ -95,6 +100,8 @@ class ImageCollectionViewer(gtk.VBox):
 
     def __init__(self, start_window=True):
         super(gtk.VBox, self).__init__()
+        self.using_powerd = self._verify_powerd_directory()
+        self._inhibit_suspend()
 
         self.image = gtk.Image()
         self.pack_start(self.image, True, True, padding=0)
@@ -170,6 +177,7 @@ class ImageCollectionViewer(gtk.VBox):
         print 'Size available for image: %d x %d' % (width_av, height_av)
 
     def __next_clicked_cb(self, button):
+        self._allow_suspend()
         gtk.main_quit()
 
     def auto_change_image(self):
@@ -190,6 +198,35 @@ class ImageCollectionViewer(gtk.VBox):
         if self.image_order < 0:
             self.image_order = len(self.image_files_list) - 1
         self.image.set_from_file(self.image_files_list[self.image_order])
+
+    def finish(self):
+        self._allow_suspend()
+
+    def _verify_powerd_directory(self):
+        using_powerd = os.access(POWERD_INHIBIT_DIR, os.W_OK)
+        logging.debug("using_powerd: %d", using_powerd)
+        return using_powerd
+
+    def _inhibit_suspend(self):
+        if self.using_powerd:
+            flag_file_name = self._powerd_flag_name()
+            try:
+                file(flag_file_name, 'w').write('')
+                logging.debug("inhibit_suspend file is %s", flag_file_name)
+            except IOError:
+                pass
+
+    def _allow_suspend(self):
+        if self.using_powerd:
+            flag_file_name = self._powerd_flag_name()
+            try:
+                os.unlink(flag_file_name)
+                logging.debug("allow_suspend unlinking %s", flag_file_name)
+            except IOError:
+                pass
+
+    def _powerd_flag_name(self):
+        return POWERD_INHIBIT_DIR + "/%u" % os.getpid()
 
 
 def main():

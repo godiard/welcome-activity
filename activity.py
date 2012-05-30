@@ -181,7 +181,7 @@ class ImageCollectionViewer(gtk.VBox):
         gtk.main_quit()
 
     def auto_change_image(self):
-        self.next_image_clicked_cb(None)
+        self.next_image_clicked_cb(None, None)
         return True
 
     def next_image_clicked_cb(self, button, event):

@@ -1,6 +1,6 @@
 [Activity]
 name = Welcome
-activity_version = 3
+activity_version = 4
 bundle_id = org.laptop.WelcomeActivity
 exec = sugar-activity activity.WelcomeActivity
 icon = welcome-activity

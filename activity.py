@@ -21,6 +21,7 @@ import gettext
 
 import gtk
 import gobject
+import gconf
 
 from sugar.activity import activity
 from sugar.graphics.toolbarbox import ToolbarBox
@@ -231,7 +232,16 @@ class ImageCollectionViewer(gtk.VBox):
         return POWERD_INHIBIT_DIR + "/%u" % os.getpid()
 
 
+def set_fonts():
+    client = gconf.client_get_default()
+    face = client.get_string('/desktop/sugar/font/default_face')
+    size = client.get_float('/desktop/sugar/font/default_size')
+    settings = gtk.settings_get_default()
+    settings.set_property("gtk-font-name", "%s %f" % (face, size))
+
+
 def main():
+    set_fonts()
     win = gtk.Window()
     image_viewer = ImageCollectionViewer()
     win.add(image_viewer)

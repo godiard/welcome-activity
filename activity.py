@@ -185,18 +185,19 @@ class ImageCollectionViewer(gtk.VBox):
 
     def auto_change_image(self):
         self.next_image_clicked_cb(None, None)
+        self.timer_id = gobject.timeout_add_seconds(DEFAULT_CHANGE_IMAGE_TIME,
+                self.auto_change_image)
         return True
 
     def next_image_clicked_cb(self, button, event):
         gobject.source_remove(self.timer_id)
-        self.timer_id = gobject.timeout_add_seconds(DEFAULT_CHANGE_IMAGE_TIME,
-                self.auto_change_image)
         self.image_order += 1
         if self.image_order == len(self.image_files_list):
             self.image_order = 0
         self.image.set_from_file(self.image_files_list[self.image_order])
 
     def prev_image_clicked_cb(self, button, event):
+        gobject.source_remove(self.timer_id)
         self.image_order -= 1
         if self.image_order < 0:
             self.image_order = len(self.image_files_list) - 1

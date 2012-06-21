@@ -115,7 +115,7 @@ class ImageCollectionViewer(gtk.VBox):
 
         self.image_order = 0
         self.image_files_list = []
-        for fname in os.listdir(images_path):
+        for fname in sorted(os.listdir(images_path)):
             self.image_files_list.append(images_path + fname)
             logging.error('Image file: %s', fname)
 

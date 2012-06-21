@@ -18,6 +18,7 @@ import os
 import logging
 #from gettext import gettext as _
 import gettext
+import math
 
 import gtk
 import gobject
@@ -152,6 +153,8 @@ class ImageCollectionViewer(gtk.VBox):
             _next_button.set_image(next_image)
             _next_button.connect('clicked', self.__next_clicked_cb)
 
+            self.sequence_view = SequenceView(len(self.image_files_list))
+
             right_box.pack_end(_next_button, False, False,
                     padding=style.zoom(30))
             bt_width, bt_height = _next_button.size_request()
@@ -159,6 +162,8 @@ class ImageCollectionViewer(gtk.VBox):
             prev_bt = CustomButton('go-previous-paired-grey', bt_height)
             center_box.pack_start(prev_bt, False, False, 5)
             prev_bt.connect('button-press-event', self.prev_image_clicked_cb)
+
+            center_box.pack_start(self.sequence_view, False, False, padding=5)
 
             next_bt = CustomButton('go-next-paired-grey', bt_height)
             center_box.pack_start(next_bt, False, False, 5)
@@ -168,6 +173,9 @@ class ImageCollectionViewer(gtk.VBox):
             width = int(gtk.gdk.screen_width() / 4)
             right_box.set_size_request(width, -1)
             left_box.set_size_request(width, -1)
+
+        else:
+            self.sequence_view = None
 
         self.show_all()
 
@@ -195,6 +203,8 @@ class ImageCollectionViewer(gtk.VBox):
         self.image_order += 1
         if self.image_order == len(self.image_files_list):
             self.image_order = 0
+        if self.sequence_view is not None:
+            self.sequence_view.set_value(self.image_order + 1)
         self.image.set_from_file(self.image_files_list[self.image_order])
 
     def prev_image_clicked_cb(self, button, event):
@@ -202,6 +212,8 @@ class ImageCollectionViewer(gtk.VBox):
         self.image_order -= 1
         if self.image_order < 0:
             self.image_order = len(self.image_files_list) - 1
+        if self.sequence_view is not None:
+            self.sequence_view.set_value(self.image_order + 1)
         self.image.set_from_file(self.image_files_list[self.image_order])
 
     def finish(self):
@@ -232,6 +244,63 @@ class ImageCollectionViewer(gtk.VBox):
 
     def _powerd_flag_name(self):
         return POWERD_INHIBIT_DIR + "/%u" % os.getpid()
+
+
+class SequenceView(gtk.DrawingArea):
+
+    def __init__(self, cant, point_size=10):
+        super(gtk.DrawingArea, self).__init__()
+        self._cant = cant
+        self._value = 1
+        self._point_size = point_size
+        logging.error('init SequenceView cant= %d', self._cant)
+        self.set_size_request(self._point_size * self._cant * 2,
+                self._point_size)
+        self.connect('expose_event', self.__expose_cb)
+
+        def size_allocate_cb(widget, allocation):
+            self._width, self._height = allocation.width, allocation.height
+            self.disconnect(self._setup_handle)
+
+        self._setup_handle = self.connect('size_allocate',
+                                          size_allocate_cb)
+
+    def __expose_cb(self, widget, event):
+        rect = self.get_allocation()
+        ctx = widget.window.cairo_create()
+        # set a clip region for the expose event
+        ctx.rectangle(event.area.x, event.area.y, event.area.width,
+                event.area.height)
+        ctx.clip()
+        self.draw(ctx)
+
+    def set_value(self, value):
+        self._value = value
+        self.queue_draw()
+
+    def draw(self, ctx):
+        logging.error('draw SequenceView')
+        if self._cant == 0:
+            return
+
+        ctx.save()
+        radio = self._point_size / 2.0
+        ctx.translate(0, 0)
+        ctx.rectangle(0, 0, self._width, self._height)
+        ctx.set_source_rgb(1.0, 1.0, 1.0)
+        ctx.fill()
+        ctx.translate(radio, self._height / 2 - radio)
+        for n in range(self._cant):
+            if n < self._value:
+                ctx.set_source_rgb(0.913, 0.733, 0.0)  # eebb00
+            else:
+                ctx.set_source_rgb(0.33, 0.33, 0.33)  # grey
+
+            ctx.arc(radio, radio, radio, 0., 2 * math.pi)
+            ctx.fill()
+
+            ctx.translate(self._point_size * 2, 0)
+        ctx.restore()
 
 
 def set_fonts():

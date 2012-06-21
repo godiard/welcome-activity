@@ -31,7 +31,7 @@ from sugar.graphics import style
 from sugar.graphics.toolbutton import ToolButton
 from sugar.graphics.icon import Icon
 
-DEFAULT_CHANGE_IMAGE_TIME = 10
+DEFAULT_CHANGE_IMAGE_TIME = 15
 POWERD_INHIBIT_DIR = '/var/run/powerd-inhibit-suspend'
 
 
@@ -151,6 +151,7 @@ class ImageCollectionViewer(gtk.VBox):
             next_image = Icon(icon_name='go-right')
             _next_button.set_image(next_image)
             _next_button.connect('clicked', self.__next_clicked_cb)
+
             right_box.pack_end(_next_button, False, False,
                     padding=style.zoom(30))
             bt_width, bt_height = _next_button.size_request()

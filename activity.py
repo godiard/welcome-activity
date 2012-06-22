@@ -231,7 +231,7 @@ class ImageCollectionViewer(gtk.VBox):
             try:
                 file(flag_file_name, 'w').write('')
                 logging.debug("inhibit_suspend file is %s", flag_file_name)
-            except IOError:
+            except OSError, IOError:
                 pass
 
     def _allow_suspend(self):
@@ -240,7 +240,7 @@ class ImageCollectionViewer(gtk.VBox):
             try:
                 os.unlink(flag_file_name)
                 logging.debug("allow_suspend unlinking %s", flag_file_name)
-            except IOError:
+            except OSError, IOError:
                 pass
 
     def _powerd_flag_name(self):

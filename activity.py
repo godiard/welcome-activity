@@ -194,9 +194,6 @@ class ImageCollectionViewer(gtk.VBox):
 
         self.show_all()
 
-        self.timer_id = gobject.timeout_add(
-                int(DEFAULT_CHANGE_IMAGE_TIME * 1000), self.auto_change_image)
-
         # calculate space available for images
         #   (only to tell to the designers)
         height_av = gtk.gdk.screen_height() - style.GRID_CELL_SIZE * 2
@@ -219,13 +216,11 @@ class ImageCollectionViewer(gtk.VBox):
             else:
                 self.image_order = 0
                 self._update_image()
-
-        self.timer_id = gobject.timeout_add(
-                int(DEFAULT_CHANGE_IMAGE_TIME * 1000), self.auto_change_image)
         return False
 
     def next_anim_clicked_cb(self, button, event):
         if button is not None:
+            gobject.source_remove(self.timer_id)
             self.auto_change_anim = False
         self.image_order = 0
         self.anim_order += 1
@@ -239,6 +234,7 @@ class ImageCollectionViewer(gtk.VBox):
 
     def prev_anim_clicked_cb(self, button, event):
         if button is not None:
+            gobject.source_remove(self.timer_id)
             self.auto_change_anim = False
         self.image_order = 0
         self.anim_order -= 1
@@ -255,6 +251,8 @@ class ImageCollectionViewer(gtk.VBox):
                 self.animation_list[self.anim_order][self.image_order]
         self.image.set_from_file(image_file_name)
         self.get_root_window().set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR))
+        self.timer_id = gobject.timeout_add(
+                int(DEFAULT_CHANGE_IMAGE_TIME * 1000), self.auto_change_image)
 
     def finish(self):
         self._allow_suspend()

@@ -32,7 +32,7 @@ from sugar.graphics import style
 from sugar.graphics.toolbutton import ToolButton
 from sugar.graphics.icon import Icon
 
-DEFAULT_CHANGE_IMAGE_TIME = 2
+DEFAULT_CHANGE_IMAGE_TIME = 1.5
 POWERD_INHIBIT_DIR = '/var/run/powerd-inhibit-suspend'
 
 
@@ -121,12 +121,12 @@ class ImageCollectionViewer(gtk.VBox):
         for fname in sorted(os.listdir(images_path)):
             if os.path.isdir(images_path + fname):
                 anim_path = images_path + fname
-                logging.error('Animation dir file: %s', anim_path)
+                logging.debug('Animation dir file: %s', anim_path)
                 animation_images_list = []
                 for imagefname in sorted(os.listdir(anim_path)):
                     image_path = os.path.join(anim_path, imagefname)
                     animation_images_list.append(image_path)
-                    logging.error('Image file: %s', image_path)
+                    logging.debug('Image file: %s', image_path)
                 self.animation_list.append(animation_images_list)
             else:
                 self.animation_list.append([images_path + fname])
@@ -194,8 +194,8 @@ class ImageCollectionViewer(gtk.VBox):
 
         self.show_all()
 
-        self.timer_id = gobject.timeout_add_seconds(DEFAULT_CHANGE_IMAGE_TIME,
-                self.auto_change_image)
+        self.timer_id = gobject.timeout_add(
+                int(DEFAULT_CHANGE_IMAGE_TIME * 1000), self.auto_change_image)
 
         # calculate space available for images
         #   (only to tell to the designers)
@@ -220,8 +220,8 @@ class ImageCollectionViewer(gtk.VBox):
                 self.image_order = 0
                 self._update_image()
 
-        self.timer_id = gobject.timeout_add_seconds(DEFAULT_CHANGE_IMAGE_TIME,
-                self.auto_change_image)
+        self.timer_id = gobject.timeout_add(
+                int(DEFAULT_CHANGE_IMAGE_TIME * 1000), self.auto_change_image)
         return False
 
     def next_anim_clicked_cb(self, button, event):
@@ -233,7 +233,9 @@ class ImageCollectionViewer(gtk.VBox):
             self.anim_order = 0
         if self.sequence_view is not None:
             self.sequence_view.set_value(self.anim_order + 1)
-        self._update_image()
+
+        self.get_root_window().set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+        gobject.idle_add(self._update_image)
 
     def prev_anim_clicked_cb(self, button, event):
         if button is not None:
@@ -244,12 +246,15 @@ class ImageCollectionViewer(gtk.VBox):
             self.anim_order = len(self.animation_list) - 1
         if self.sequence_view is not None:
             self.sequence_view.set_value(self.anim_order + 1)
-        self._update_image()
+
+        self.get_root_window().set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+        gobject.idle_add(self._update_image)
 
     def _update_image(self):
         image_file_name = \
                 self.animation_list[self.anim_order][self.image_order]
         self.image.set_from_file(image_file_name)
+        self.get_root_window().set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR))
 
     def finish(self):
         self._allow_suspend()

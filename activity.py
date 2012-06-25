@@ -136,12 +136,6 @@ class ImageCollectionViewer(gtk.VBox):
 
         if start_window:
             # Create bottom controls
-
-            center_align = gtk.Alignment(0.5, 0, 0, 0)
-            self.pack_start(center_align, False, padding=2)
-            self.sequence_view = SequenceView(len(self.animation_list))
-            center_align.add(self.sequence_view)
-
             bottom_toolbar = gtk.HBox()
             self.pack_start(bottom_toolbar, False, padding=style.zoom(30))
 
@@ -169,6 +163,8 @@ class ImageCollectionViewer(gtk.VBox):
             _next_button.set_image(next_image)
             _next_button.connect('clicked', self.__next_clicked_cb)
 
+            self.sequence_view = SequenceView(len(self.animation_list))
+
             right_box.pack_end(_next_button, False, False,
                     padding=style.zoom(30))
             bt_width, bt_height = _next_button.size_request()
@@ -176,6 +172,8 @@ class ImageCollectionViewer(gtk.VBox):
             prev_bt = CustomButton('go-previous-paired-grey', bt_height)
             center_box.pack_start(prev_bt, False, False, 5)
             prev_bt.connect('button-press-event', self.prev_anim_clicked_cb)
+
+            center_box.pack_start(self.sequence_view, False, False, padding=5)
 
             next_bt = CustomButton('go-next-paired-grey', bt_height)
             center_box.pack_start(next_bt, False, False, 5)
@@ -317,7 +315,6 @@ class SequenceView(gtk.DrawingArea):
         self.queue_draw()
 
     def draw(self, ctx):
-        logging.error('draw SequenceView')
         if self._cant == 0:
             return
 

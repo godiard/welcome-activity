@@ -187,7 +187,10 @@ class ImageCollectionViewer(gtk.VBox):
             left_box.set_size_request(width, -1)
 
         else:
-            self.sequence_view = None
+            center_align = gtk.Alignment(0.5, 0, 0, 0)
+            self.pack_start(center_align, False, padding=2)
+            self.sequence_view = SequenceView(len(self.animation_list))
+            center_align.add(self.sequence_view)
 
         self.show_all()
 

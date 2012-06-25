@@ -32,7 +32,7 @@ from sugar.graphics import style
 from sugar.graphics.toolbutton import ToolButton
 from sugar.graphics.icon import Icon
 
-DEFAULT_CHANGE_IMAGE_TIME = 15
+DEFAULT_CHANGE_IMAGE_TIME = 2
 POWERD_INHIBIT_DIR = '/var/run/powerd-inhibit-suspend'
 
 
@@ -57,12 +57,12 @@ class WelcomeActivity(activity.Activity):
         self.image_viewer = ImageCollectionViewer(False)
 
         prev_bt = ToolButton("go-previous-paired")
-        prev_bt.connect("clicked", self.image_viewer.prev_image_clicked_cb,
+        prev_bt.connect("clicked", self.image_viewer.prev_anim_clicked_cb,
                 None)
         toolbar_box.toolbar.insert(prev_bt, -1)
 
         next_bt = ToolButton("go-next-paired")
-        next_bt.connect("clicked", self.image_viewer.next_image_clicked_cb,
+        next_bt.connect("clicked", self.image_viewer.next_anim_clicked_cb,
                 None)
         toolbar_box.toolbar.insert(next_bt, -1)
 
@@ -114,21 +114,32 @@ class ImageCollectionViewer(gtk.VBox):
         images_path = \
                 os.path.expanduser('~/Activities/Welcome.activity/images/')
 
+        self.anim_order = 0
         self.image_order = 0
-        self.image_files_list = []
+        self.auto_change_anim = True
+        self.animation_list = []
         for fname in sorted(os.listdir(images_path)):
-            self.image_files_list.append(images_path + fname)
-            logging.error('Image file: %s', fname)
+            if os.path.isdir(images_path + fname):
+                anim_path = images_path + fname
+                logging.error('Animation dir file: %s', anim_path)
+                animation_images_list = []
+                for imagefname in sorted(os.listdir(anim_path)):
+                    image_path = os.path.join(anim_path, imagefname)
+                    animation_images_list.append(image_path)
+                    logging.error('Image file: %s', image_path)
+                self.animation_list.append(animation_images_list)
+            else:
+                self.animation_list.append([images_path + fname])
 
-        if self.image_files_list:
-            self.image.set_from_file(self.image_files_list[self.image_order])
+        if self.animation_list:
+            self._update_image()
 
         if start_window:
             # Create bottom controls
 
             center_align = gtk.Alignment(0.5, 0, 0, 0)
             self.pack_start(center_align, False, padding=2)
-            self.sequence_view = SequenceView(len(self.image_files_list))
+            self.sequence_view = SequenceView(len(self.animation_list))
             center_align.add(self.sequence_view)
 
             bottom_toolbar = gtk.HBox()
@@ -164,11 +175,11 @@ class ImageCollectionViewer(gtk.VBox):
 
             prev_bt = CustomButton('go-previous-paired-grey', bt_height)
             center_box.pack_start(prev_bt, False, False, 5)
-            prev_bt.connect('button-press-event', self.prev_image_clicked_cb)
+            prev_bt.connect('button-press-event', self.prev_anim_clicked_cb)
 
             next_bt = CustomButton('go-next-paired-grey', bt_height)
             center_box.pack_start(next_bt, False, False, 5)
-            next_bt.connect('button-press-event', self.next_image_clicked_cb)
+            next_bt.connect('button-press-event', self.next_anim_clicked_cb)
 
             # do the right_box and left_box have the same size
             width = int(gtk.gdk.screen_width() / 4)
@@ -194,28 +205,48 @@ class ImageCollectionViewer(gtk.VBox):
         gtk.main_quit()
 
     def auto_change_image(self):
-        self.next_image_clicked_cb(None, None)
+        # Change to the next image in the animation,
+        # if is the last, change to the next animation
+        if self.image_order < len(self.animation_list[self.anim_order]) - 1:
+            self.image_order += 1
+            self._update_image()
+        else:
+            if self.auto_change_anim:
+                self.next_anim_clicked_cb(None, None)
+            else:
+                self.image_order = 0
+                self._update_image()
+
         self.timer_id = gobject.timeout_add_seconds(DEFAULT_CHANGE_IMAGE_TIME,
                 self.auto_change_image)
-        return True
+        return False
 
-    def next_image_clicked_cb(self, button, event):
-        gobject.source_remove(self.timer_id)
-        self.image_order += 1
-        if self.image_order == len(self.image_files_list):
-            self.image_order = 0
+    def next_anim_clicked_cb(self, button, event):
+        if button is not None:
+            self.auto_change_anim = False
+        self.image_order = 0
+        self.anim_order += 1
+        if self.anim_order == len(self.animation_list):
+            self.anim_order = 0
         if self.sequence_view is not None:
-            self.sequence_view.set_value(self.image_order + 1)
-        self.image.set_from_file(self.image_files_list[self.image_order])
+            self.sequence_view.set_value(self.anim_order + 1)
+        self._update_image()
 
-    def prev_image_clicked_cb(self, button, event):
-        gobject.source_remove(self.timer_id)
-        self.image_order -= 1
-        if self.image_order < 0:
-            self.image_order = len(self.image_files_list) - 1
+    def prev_anim_clicked_cb(self, button, event):
+        if button is not None:
+            self.auto_change_anim = False
+        self.image_order = 0
+        self.anim_order -= 1
+        if self.anim_order < 0:
+            self.anim_order = len(self.animation_list) - 1
         if self.sequence_view is not None:
-            self.sequence_view.set_value(self.image_order + 1)
-        self.image.set_from_file(self.image_files_list[self.image_order])
+            self.sequence_view.set_value(self.anim_order + 1)
+        self._update_image()
+
+    def _update_image(self):
+        image_file_name = \
+                self.animation_list[self.anim_order][self.image_order]
+        self.image.set_from_file(image_file_name)
 
     def finish(self):
         self._allow_suspend()

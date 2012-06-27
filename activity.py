@@ -249,8 +249,10 @@ class ImageCollectionViewer(gtk.VBox):
                 self.animation_list[self.anim_order][self.image_order]
         self.image.set_from_file(image_file_name)
         self.get_root_window().set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR))
-        self.timer_id = gobject.timeout_add(
-                int(DEFAULT_CHANGE_IMAGE_TIME * 1000), self.auto_change_image)
+        time = int(DEFAULT_CHANGE_IMAGE_TIME * 1000)
+        if self.image_order == 0:
+            time = time * 2
+        self.timer_id = gobject.timeout_add(time, self.auto_change_image)
 
     def finish(self):
         self._allow_suspend()
